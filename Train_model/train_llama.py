@@ -12,7 +12,7 @@ import torch.backends.cudnn as cudnn
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-max_seq_length = 1024
+max_seq_length = 512
 
 def format_data(entry):
     task = entry.get("problem", "").strip()
@@ -117,24 +117,24 @@ def main():
 
     # Define TrainingArguments with careful consideration of resources and task requirements
     training_args = TrainingArguments(
-        learning_rate=3e-5,
-        lr_scheduler_type="linear",
-        per_device_train_batch_size=4,  # Increase batch size
-        gradient_accumulation_steps=1,  # Adjust as needed
-        max_grad_norm=1.0,  # Enable gradient clipping
+        learning_rate=8e-5,
+        lr_scheduler_type="cosine",
+        per_device_train_batch_size=1,  # Increase batch size
+        gradient_accumulation_steps=2,  # Adjust as needed
+        max_grad_norm=2.0,  # Enable gradient clipping
         num_train_epochs=1,  # Increase epochs for better learning
         bf16=True,  # Continue using BF16
-        logging_steps=50,  # Reduce frequency of logging
+        logging_steps=25,  # Reduce frequency of logging
         optim="adamw_torch",
         weight_decay=0.01,
         warmup_steps=500,  # Increase warmup for stable gradients
         output_dir="./finetuned_llama",
         seed=42,
-        save_total_limit=3,
+        save_total_limit=2,
         save_steps=500,  # Adjust checkpoint saving frequency
         run_name="llama_coding_SFT",
         report_to="wandb",
-        dataloader_num_workers=4,
+        dataloader_num_workers=2,
     )
 
     class WandbCallback(TrainerCallback):
