@@ -1,7 +1,6 @@
 import json
 import os
 import hashlib
-from openai import OpenAI
 from datasets import load_dataset, concatenate_datasets
 import tiktoken
 
@@ -126,29 +125,3 @@ for i in range(len(combined_dataset)):
 f.close()
 print(f"{jsonl_filename} created with {counter_per_batch} requests.")
 print(f"Unique requests: {request_counter}\nEmpty solutions: {empty_solutions}\nDuplicates: {duplicates}\nTruncated prompts: {truncated}")
-
-client = OpenAI(api_key='your-openai-api-key')
-
-# Step 2: Upload the JSONL Files and Create Batches
-for file_number in range(1, file_counter + 1):
-    jsonl_filename = f"Ready_data/Batches/raw_data_apps_{file_number}.jsonl"
-    
-    batch_input_file = client.files.create(
-        file=open(jsonl_filename, "rb"),
-        purpose="batch"
-    )
-    batch_input_file_id = batch_input_file['id']
-    print(f"File {jsonl_filename} uploaded with ID: {batch_input_file_id}")
-
-    # Step 3: Create the Batch
-    batch = client.batches.create(
-        input_file_id=batch_input_file_id,
-        endpoint="/v1/chat/completions",
-        completion_window="24h",
-        metadata={
-            "description": f"Code solution explanation batch {file_number}"
-        }
-    )
-
-    batch_id = batch['id']
-    print(f"Batch created with ID: {batch_id}")
